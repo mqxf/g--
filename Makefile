@@ -15,7 +15,7 @@ install:
 
 clean:
 	-rm $(objects)
-	-rm cobyc
+	-rm g--
 	clear
 
 lint:
