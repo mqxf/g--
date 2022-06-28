@@ -24,13 +24,14 @@ enum Token {
     TKN_CONTINUE = -12,
     TKN_WHILE = -13,
     TKN_EXTERN = -14,
+    TKN_VOID = -15,
 
     //literals
-    TKN_IDENTIFIER = -15,
-    TKN_FLOAT_LITERAL = -16,
-    TKN_INT_LITERAL = -17,
-    TKN_STRING_LITERAL = -18,
-    TKN_CHAR_LITERAL = -19,
+    TKN_IDENTIFIER = -16,
+    TKN_FLOAT_LITERAL = -17,
+    TKN_INT_LITERAL = -18,
+    TKN_STRING_LITERAL = -19,
+    TKN_CHAR_LITERAL = -20,
 };
 
 class Lexer {

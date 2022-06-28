@@ -14,7 +14,7 @@ void Parser::nextToken() {
     this->token = lexer->nextToken();
 }
 
-ExpressionAST* Parser::parseNumberExpression() {    
+ExpressionAST* Parser::parseNumberExpression() {
     NumberExpressionAST* res = new NumberExpressionAST(this->lexer->isLastFloat() ? this->lexer->getDVal() : this->lexer->getLVal());
     this->nextToken();
     return res;
@@ -59,11 +59,11 @@ ExpressionAST* Parser::parseIdentifierExpression() {
             else {
                 return nullptr;
             }
-            
+
             if (this->token == ')') {
                 break;
             }
-            
+
             if (this->token != ',') {
                 log("Expected ')' or ',' in argument list", Severity::ERROR);
                 return nullptr;
@@ -112,7 +112,7 @@ ExpressionAST* Parser::parseBinOpRHS(int exprPrec, ExpressionAST* LHS) {
         if (tokPrec < nextPrec) {
             RHS = parseBinOpRHS(tokPrec + 1, RHS);
             if (!RHS) return nullptr;
-        }   
+        }
 
         LHS = new BinaryExprAST(getBinOpId(binop), LHS, RHS);
     }
@@ -149,16 +149,17 @@ PrototypeAST* Parser::parsePrototype() {
         if (this->token == TKN_CHAR) type = TYPE_CHAR;
         else if (this->token == TKN_INT) type = TYPE_INT;
         else if (this->token == TKN_FLOAT) type = TYPE_FLOAT;
+        else if (this->token == TKN_VOID) type = TYPE_VOID;
         else {
             log("Invalid type for function!", Severity::ERROR);
             return nullptr;
         }
     }
 
-    this->nextToken();    
+    this->nextToken();
 
     if (this->token != TKN_IDENTIFIER) {
-        log("Expected function name in prototype", Severity::ERROR);
+        log("Expected function name in function definition", Severity::ERROR);
         return nullptr;
     }
 
@@ -166,7 +167,7 @@ PrototypeAST* Parser::parsePrototype() {
     this->nextToken();
 
     if (this->token != '(') {
-        log("Expected '(' in prototype", Severity::ERROR);
+        log("Expected '(' in function definition", Severity::ERROR);
         return nullptr;
     }
 
@@ -190,7 +191,7 @@ PrototypeAST* Parser::parsePrototype() {
 }
 
 VariableDeclarationAST* Parser::parseVariableDeclaration() {
- 
+
     int type;
     bool cnst = false;
 
@@ -210,10 +211,10 @@ VariableDeclarationAST* Parser::parseVariableDeclaration() {
         else if (this->token == TKN_INT) type = TYPE_INT;
         else if (this->token == TKN_FLOAT) type = TYPE_FLOAT;
         else {
-            log("Invalid type for function!", Severity::ERROR);
+            log("Invalid type for variable!", Severity::ERROR);
             return nullptr;
         }
-    }   
+    }
 
     this->nextToken();
 
@@ -278,7 +279,7 @@ VariableDeclarationAST* Parser::parseVariableDeclaration() {
         case TYPE_CHAR:
             if (this->token != TKN_CHAR_LITERAL) {
                 log("Expected char value.", Severity::ERROR);
-                return nullptr;           
+                return nullptr;
             }
             value.clear();
             value.push_back(this->lexer->getCVal());
@@ -302,6 +303,50 @@ VariableDeclarationAST* Parser::parseVariableDeclaration() {
     return new VariableDeclarationAST(name, type, cnst, value);
 }
 
-void Parser::loop() {
-    parseVariableDeclaration();
+FunctionAST* Parser::parseDefinition() {
+    auto Proto = this->parsePrototype();
+    if (!Proto) return nullptr;
+
+    if (auto E = this->parseExpression()) {
+        return new FunctionAST(Proto, E);
+    }
+    return nullptr;
+}
+
+FunctionAST* Parser::parseTopLevelExpr() {
+  if (auto E = this->parseExpression()) {
+    std::vector<VariableDeclarationAST*> args;
+    auto Proto = new PrototypeAST("__anon_func_", TYPE_VOID, args);
+    return new FunctionAST(Proto, E);
+  }
+  return nullptr;
+}
+
+PrototypeAST* Parser::parseExtern() {
+  this->nextToken();
+  return this->parsePrototype();
+}
+
+void Parser::mainLoop() {
+    while (true) {
+        switch (this->token) {
+            case TKN_EOF: return;
+            case ';':
+                this->nextToken();
+                break;
+            case TKN_VOID:
+            case TKN_FLOAT:
+            case TKN_INT:
+            case TKN_LONG:
+            case TKN_CHAR:
+                //handle function definition
+                break;
+            case TKN_EXTERN:
+                //handle function prototype
+                break;
+            default:
+                //handle top level expression
+                break;
+        }
+    }
 }

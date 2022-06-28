@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <llvm/IR/Value.h>
+#include "../utils/utils.h"
 
 enum BinOp {
     OP_ADD = 1, 
@@ -31,6 +33,7 @@ enum DataType {
     TYPE_LONG = 3,
     TYPE_FLOAT = 4,
     TYPE_DOUBLE = 5,
+    TYPE_VOID = 6,
 };
 
 class ExpressionAST {
@@ -38,6 +41,7 @@ class ExpressionAST {
 
     public:
         virtual ~ExpressionAST() {}
+        virtual Value* codegen() = 0;
 };
 
 class NumberExpressionAST : public ExpressionAST {
@@ -49,6 +53,7 @@ class NumberExpressionAST : public ExpressionAST {
     public:
         NumberExpressionAST(double fVal);
         NumberExpressionAST(long long lVal);
+        Value* codegen() override;
 };
 
 class StringExpressionAST : public ExpressionAST {
@@ -57,6 +62,7 @@ class StringExpressionAST : public ExpressionAST {
 
     public:
         StringExpressionAST(std::string value);
+        Value* codegen() override;
 };
 
 class VariableExpressionAST : public ExpressionAST {
@@ -65,6 +71,7 @@ class VariableExpressionAST : public ExpressionAST {
         
     public:
         VariableExpressionAST(const std::string name);
+        Value* codegen() override;
 };
 
 class VariableDeclarationAST : public ExpressionAST {
@@ -77,6 +84,7 @@ class VariableDeclarationAST : public ExpressionAST {
     public:
         VariableDeclarationAST(std::string name, int type, bool cnst);
         VariableDeclarationAST(std::string name, int type, bool cnst, std::string value);
+        Value* codegen() override;
 };
 
 class BinaryExprAST : public ExpressionAST {
@@ -87,6 +95,7 @@ class BinaryExprAST : public ExpressionAST {
 
     public:
         BinaryExprAST(int op, ExpressionAST* LHS, ExpressionAST* RHS);
+        Value* codegen() override;
 };
 
 class CallExpressionAST : public ExpressionAST {
@@ -95,6 +104,7 @@ class CallExpressionAST : public ExpressionAST {
         std::vector<ExpressionAST*> args;
     public:
         CallExpressionAST(std::string callee, std::vector<ExpressionAST*> args);
+        Value* codegen() override;
 };
 
 //Function AST

@@ -21,9 +21,12 @@ class Parser {
         ExpressionAST* parseBinOpRHS(int exprPrec, ExpressionAST* LHS);
         PrototypeAST* parsePrototype();
         VariableDeclarationAST* parseVariableDeclaration();
+        FunctionAST* parseDefinition();
+        FunctionAST* parseTopLevelExpr();
+        PrototypeAST* parseExtern();
     public:
         Parser(Lexer* lexer);
-        void loop();
+        void mainLoop();
 };
 
 #endif

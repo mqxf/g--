@@ -4,13 +4,12 @@
 #include "../main.h"
 #include "../file/file.h"
 #include "../lexer/lexer.h"
-#include "../parser/parser.h"
+#include "../parser/parser.h" 
 
 std::string compile(std::string input) {
 
     Lexer* lexer = new Lexer(input);
     Parser* parser = new Parser(lexer);
-    parser->loop();
     return "";
 }
 

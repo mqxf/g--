@@ -83,6 +83,7 @@ int Lexer::nextToken() {
         if (this->str == "continue") return TKN_CONTINUE;
         if (this->str == "while") return TKN_WHILE;
         if (this->str == "extern") return TKN_EXTERN;
+        if (this->str == "void") return TKN_VOID;
         return TKN_IDENTIFIER;
     }    
     
